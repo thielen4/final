@@ -1,0 +1,20 @@
+<h2>
+    <i class="far fa-calendar-alt"></i>
+    <%= @gym[:location] %>
+</h2>
+<h1>Write review for <%= @gym[:gym] %></h1>
+
+<form action="/gyms/<%= @gym[:id] %>/reviews/create">
+  <div class="form-group">
+    <label>What do you think of this gym?</label>
+    <select class="form-control" name="thumbs">
+      <option value="1">Thumbs up!</option>
+      <option value="0">Thumbs down.</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Comments</label>
+    <textarea class="form-control" rows="3" name="comments"></textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit your review</button>
+</form>
