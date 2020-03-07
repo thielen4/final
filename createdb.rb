@@ -5,31 +5,37 @@ DB = Sequel.connect(connection_string)                                          
 #######################################################################################
 
 # Database schema - this should reflect your domain model
-DB.create_table! :events do
+DB.create_table! :gyms do
   primary_key :id
-  String :title
+  String :gym
   String :description, text: true
-  String :date
   String :location
+  String :phone
 end
-DB.create_table! :rsvps do
+DB.create_table! :reviews do
   primary_key :id
-  foreign_key :event_id
-  Boolean :going
+  foreign_key :gym_id
+  Boolean :thumbs
   String :name
   String :email
   String :comments, text: true
 end
+DB.create_table! :users do
+  primary_key :id
+  String :name
+  String :email
+  String :password
+end
 
 # Insert initial (seed) data
-events_table = DB.from(:events)
+gyms_table = DB.from(:gyms)
 
-events_table.insert(title: "Bacon Burger Taco Fest", 
-                    description: "Here we go again bacon burger taco fans, another Bacon Burger Taco Fest is here!",
-                    date: "June 21",
-                    location: "Kellogg Global Hub")
+gyms_table.insert(gym: "Rockwell Barbell", 
+                    description: "Don't limit yourself: Rockwell Barbell in Chicago is the perfect place to test your strength. There are trainers for every fitness level and ability. Join the Rockwell community today.",
+                    location: "2861 North Clybourn Avenue, Chicago, IL 60618",
+                    phone: "+17736974871")
 
-events_table.insert(title: "Kaleapolooza", 
-                    description: "If you're into nutrition and vitamins and stuff, this is the event for you.",
-                    date: "July 4",
-                    location: "Nowhere")
+gyms_table.insert(gym: "Rabat Barbell Club", 
+                    description: "Established in 2019, Rabat Barbell Club has all the latest power lifting equipment in a beautiful, modern space. The trainers are experienced power lifters, and can help you achieve your fitness goals.",
+                    location: "Secteur 16, bloc M1, Rabat 10001, Morocco",
+                    phone: "+212608233333")
