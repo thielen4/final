@@ -35,7 +35,7 @@ gyms_table.insert(gym: "Rockwell Barbell",
                     location: "2861 North Clybourn Avenue, Chicago, IL 60618",
                     phone: "+17736974871")
 
-gyms_table.insert(gym: "Rabat Barbell Club", 
-                    description: "Established in 2019, Rabat Barbell Club has all the latest power lifting equipment in a beautiful, modern space. The trainers are experienced power lifters, and can help you achieve your fitness goals.",
-                    location: "Secteur 16, bloc M1, Rabat 10001, Morocco",
-                    phone: "+212608233333")
+gyms_table.insert(gym: "LA Fitness", 
+                    description: "LA Fitness is a basic big box gym with too many ammenities.",
+                    location: "55 E Randolph St, Chicago, IL 60601",
+                    phone: "(312) 281-0113")
