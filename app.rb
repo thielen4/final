@@ -23,29 +23,35 @@ before do
     @current_user = users_table.where(id: session["user_id"]).to_a[0]
 end
 
+#homepage and list of gyms (aka "index")
 get "/" do
     puts gyms_table.all
     @gyms = gyms_table.all.to_a
     view "gyms"
 end
 
+# gym details (aka "show")
 get "/gyms/:id" do
     @gym = gyms_table.where(id: params[:id]).to_a[0]
     @reviews = reviews_table.where(gym_id: @gym[:id])
-    @reviews_count = reviews_table.where(gym_id: @gym[:id], thumbs: true).count
     @users_table = users_table
 
     #geocode
     results = Geocoder.search(@gym[:location])
-    @lat_long = results.first.coordinates # => [lat, long]
+    @georesults = results.first.coordinates # => [lat, long]
+    @lat = @georesults[0]
+    @long = @georesults[1]
+    @lat_long = "#{@lat},#{@long}"
     view "gym"
 end
 
+# display the review form (aka "new")
 get "/gyms/:id/reviews/new" do
     @gym = gyms_table.where(id: params[:id]).to_a[0]
     view "new_review"
 end
 
+# receive the submitted rsvp form (aka "create")
 get "/gyms/:id/reviews/create" do
     puts params
     @gym = gyms_table.where(id: params["id"]).to_a[0]
@@ -53,38 +59,105 @@ get "/gyms/:id/reviews/create" do
                        user_id: session["user_id"],
                        thumbs: params["thumbs"],
                        comments: params["comments"])
-    view "create_review"
+    redirect "/gyms/#{@gym[:id]}"
 end
 
+# display the review form (aka "edit")
+get "/rsvps/:id/edit" do
+    puts "params: #{params}"
+
+    @review = reviews_table.where(id: params["id"]).to_a[0]
+    @gym = gyms_table.where(id: @rreview[:gym_id]).to_a[0]
+    view "edit_review"
+end
+
+# receive the submitted review form (aka "update")
+post "/reviews/:id/update" do
+    puts "params: #{params}"
+
+    # find the review to update
+    @review = reviews_table.where(id: params["id"]).to_a[0]
+    # find the review's event
+    @gym = reviews_table.where(id: @review[:gym_id]).to_a[0]
+
+    if @current_user && @current_user[:id] == @review[:id]
+        reviews_table.where(id: params["id"]).update(
+            going: params["going"],
+            comments: params["comments"]
+        )
+
+        redirect "/gymss/#{@gym[:id]}"
+    else
+        view "error"
+    end
+end
+
+# delete the review (aka "destroy")
+get "/reviews/:id/destroy" do
+    puts "params: #{params}"
+
+    review = reviews_table.where(id: params["id"]).to_a[0]
+    @gym = gyms_table.where(id: review[:gym_id]).to_a[0]
+
+    reviews_table.where(id: params["id"]).delete
+
+    redirect "/gyms/#{@gym[:id]}"
+end
+
+# display the signup form (aka "new")
 get "/users/new" do
     view "new_user"
 end
 
+# receive the submitted signup form (aka "create")
 post "/users/create" do
-    puts params
-    hashed_password = BCrypt::Password.create(params["password"])
-    users_table.insert(name: params["name"], email: params["email"], password: hashed_password)
-    view "create_user"
+    puts "params: #{params}"
+
+    # if there's already a user with this email, skip!
+    existing_user = users_table.where(email: params["email"]).to_a[0]
+    if existing_user
+        view "error"
+    else
+        users_table.insert(
+            name: params["name"],
+            email: params["email"],
+            password: BCrypt::Password.create(params["password"])
+        )
+
+        redirect "/logins/new"
+    end
 end
 
+# display the login form (aka "new")
 get "/logins/new" do
     view "new_login"
 end
 
+# receive the submitted login form (aka "create")
 post "/logins/create" do
-    user = users_table.where(email: params["email"]).to_a[0]
-    puts BCrypt::Password::new(user[:password])
-    if user && BCrypt::Password::new(user[:password]) == params["password"]
-        session["user_id"] = user[:id]
-        @current_user = user
-        view "create_login"
+    puts "params: #{params}"
+
+    # step 1: user with the params["email"] ?
+    @user = users_table.where(email: params["email"]).to_a[0]
+
+    if @user
+        # step 2: if @user, does the encrypted password match?
+        if BCrypt::Password.new(@user[:password]) == params["password"]
+            # set encrypted cookie for logged in user
+            session["user_id"] = @user[:id]
+            redirect "/"
+        else
+            view "create_login_failed"
+        end
     else
         view "create_login_failed"
     end
 end
 
+
+# logout user
 get "/logout" do
+    # remove encrypted cookie for logged out user
     session["user_id"] = nil
-    @current_user = nil
-    view "logout"
+    redirect "/logins/new"
 end

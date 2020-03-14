@@ -1,5 +1,13 @@
 <h1>All Gyms</h1>
 
 <% for gym in @gyms %>
-    <p><a href="/gyms/<%= gym[:id] %>"><%= gym[:gym] %></a></p>
+    <div class="row">
+        <div class="col-sm-6">
+            <p><img src="<%= gym[:image] %>" width="300"></p>
+        </div>
+        <div class="col-sm-6">
+            <h2><a href="/gyms/<%= gym[:id] %>"><%= gym[:gym] %></a></h2>
+            <p><%= gym[:location] %></p>
+        </div>
+    </div>
 <% end %>

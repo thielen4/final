@@ -11,10 +11,12 @@ DB.create_table! :gyms do
   String :description, text: true
   String :location
   String :phone
+  String :image
 end
 DB.create_table! :reviews do
   primary_key :id
   foreign_key :gym_id
+  foreign_key :user_id
   Boolean :thumbs
   String :name
   String :email
@@ -33,9 +35,11 @@ gyms_table = DB.from(:gyms)
 gyms_table.insert(gym: "Rockwell Barbell", 
                     description: "Don't limit yourself: Rockwell Barbell in Chicago is the perfect place to test your strength. There are trainers for every fitness level and ability. Join the Rockwell community today.",
                     location: "2861 North Clybourn Avenue, Chicago, IL 60618",
-                    phone: "+17736974871")
+                    phone: "+17736974871",
+                    image: "https://cdn.shopify.com/s/files/1/0013/1255/5121/files/MG_0283_LR_2048x.jpg?v=1576558722")
 
 gyms_table.insert(gym: "LA Fitness", 
                     description: "LA Fitness is a basic big box gym with too many ammenities.",
                     location: "55 E Randolph St, Chicago, IL 60601",
-                    phone: "(312) 281-0113")
+                    phone: "(312) 281-0113",
+                    image: "https://www.lafitness.com/Pages/Images/ClubExterior/422.jpg")
